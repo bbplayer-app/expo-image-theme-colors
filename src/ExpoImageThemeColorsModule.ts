@@ -1,12 +1,9 @@
-import { NativeModule, requireNativeModule } from 'expo';
+import { NativeModule, requireNativeModule, SharedRef } from 'expo';
+import { ThemeColorResult } from './ExpoImageThemeColors.types';
+import { ImageRef } from './ImageRef';
 
-import { ExpoImageThemeColorsModuleEvents } from './ExpoImageThemeColors.types';
-
-declare class ExpoImageThemeColorsModule extends NativeModule<ExpoImageThemeColorsModuleEvents> {
-  PI: number;
-  hello(): string;
-  setValueAsync(value: string): Promise<void>;
+declare class ExpoImageThemeColorsModule extends NativeModule {
+  extractThemeColorAsync(source: string | SharedRef<'image'> | ImageRef): Promise<ThemeColorResult>;
 }
 
-// This call loads the native module object from the JSI.
 export default requireNativeModule<ExpoImageThemeColorsModule>('ExpoImageThemeColors');

@@ -1,50 +1,88 @@
+@file:OptIn(EitherType::class)
+
 package expo.modules.imagethemecolors
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import androidx.palette.graphics.Palette
+import expo.modules.kotlin.apifeatures.EitherType
+import expo.modules.kotlin.exception.CodedException
+import expo.modules.kotlin.exception.Exceptions
+import expo.modules.kotlin.exception.toCodedException
+import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.net.URL
+import expo.modules.kotlin.sharedobjects.SharedRef
+import expo.modules.kotlin.types.Either
+import expo.modules.kotlin.types.toKClass
+
+internal class ImageLoadingFailedException(cause: CodedException?) :
+    CodedException(message = "Could not load the image from sharedRef", cause)
 
 class ExpoImageThemeColorsModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
-  override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoImageThemeColors')` in JavaScript.
-    Name("ExpoImageThemeColors")
-
-    // Defines constant property on the module.
-    Constant("PI") {
-      Math.PI
+    companion object {
+        private const val TAG = "ExpoImageThemeColor"
     }
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+    override fun definition() = ModuleDefinition {
+        Name("ExpoImageThemeColors")
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+        AsyncFunction("extractThemeColorAsync") Coroutine { imageSource: Either<SharedRef<Bitmap>, SharedRef<Drawable>>
+
+            ->
+            val bitmap = getBitmapFromSource(imageSource)
+            android.util.Log.d(TAG, "get bitmap")
+
+            val palette = Palette.from(bitmap).generate()
+
+            return@Coroutine mapOf(
+                "width" to bitmap.width,
+                "height" to bitmap.height,
+                "dominant" to palette.dominantSwatch.toSwatchMap(),
+                "vibrant" to palette.vibrantSwatch.toSwatchMap(),
+                "lightVibrant" to palette.lightVibrantSwatch.toSwatchMap(),
+                "darkVibrant" to palette.darkVibrantSwatch.toSwatchMap(),
+                "muted" to palette.mutedSwatch.toSwatchMap(),
+                "lightMuted" to palette.lightMutedSwatch.toSwatchMap(),
+                "darkMuted" to palette.darkMutedSwatch.toSwatchMap()
+            )
+        }
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
+    private fun getBitmapFromSource(source: Either<SharedRef<Bitmap>, SharedRef<Drawable>>): Bitmap {
+        try {
+            if (source.`is`(toKClass<SharedRef<Bitmap>>())) {
+                return source.get(toKClass<SharedRef<Bitmap>>()).ref
+            } else {
+                val drawable = source.get(toKClass<SharedRef<Drawable>>()).ref
+
+                return (drawable as? BitmapDrawable)?.bitmap
+                    ?: throw Exceptions.IllegalArgument("Shared drawable cannot be converted to a bitmap.")
+            }
+
+        } catch (e: Exception) {
+            if (e is ImageLoadingFailedException) throw e
+            if (e is Exceptions.IllegalArgument) throw e
+
+            throw ImageLoadingFailedException(e.toCodedException())
+        }
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(ExpoImageThemeColorsView::class) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { view: ExpoImageThemeColorsView, url: URL ->
-        view.webView.loadUrl(url.toString())
-      }
-      // Defines an event that the view can send to JavaScript.
-      Events("onLoad")
+    private fun Int.toHexColor(): String {
+        return String.format("#%06X", (0xFFFFFF and this))
     }
-  }
+
+    private fun Palette.Swatch?.toSwatchMap(): Map<String, Any>? {
+        if (this == null) {
+            return null
+        }
+
+        return mapOf(
+            "hex" to this.rgb.toHexColor(),
+            "titleTextColor" to this.titleTextColor.toHexColor(),
+            "bodyTextColor" to this.bodyTextColor.toHexColor(),
+            "population" to this.population
+        )
+    }
 }

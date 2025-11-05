@@ -1,40 +1,45 @@
-import { useEvent } from 'expo';
-import ExpoImageThemeColors, { ExpoImageThemeColorsView } from 'expo-image-theme-colors';
-import { Button, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import ExpoImageThemeColors from 'expo-image-theme-colors';
+import { Button, ScrollView, Text, View } from 'react-native';
+import { useImage } from 'expo-image';
+import { useEffect } from 'react';
 
 export default function App() {
-  const onChangePayload = useEvent(ExpoImageThemeColors, 'onChange');
+  const imageRef = useImage('https://i2.hdslb.com/bfs/archive/aa7b946340dc5834309b4f529a5d3b52c69cfac8.jpg');
+
+  useEffect(() => {
+    console.log('--- sanity check start ---');
+console.log('ExpoImageThemeColors (default export) =', ExpoImageThemeColors);
+console.log('NativeModules.ExpoImageThemeColors =', ExpoImageThemeColors);
+console.log('typeof extractThemeColorAsync =', ExpoImageThemeColors ? typeof ExpoImageThemeColors.extractThemeColorAsync : 'module missing');
+console.log('--- sanity check end ---');
+  }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
       <ScrollView style={styles.container}>
         <Text style={styles.header}>Module API Example</Text>
-        <Group name="Constants">
-          <Text>{ExpoImageThemeColors.PI}</Text>
-        </Group>
-        <Group name="Functions">
-          <Text>{ExpoImageThemeColors.hello()}</Text>
-        </Group>
         <Group name="Async functions">
           <Button
-            title="Set value"
+            title="Get dominant color from url"
             onPress={async () => {
-              await ExpoImageThemeColors.setValueAsync('Hello from JS!');
+		    console.log('wtf')
+              const res = await ExpoImageThemeColors.extractThemeColorAsync('https://i2.hdslb.com/bfs/archive/aa7b946340dc5834309b4f529a5d3b52c69cfac8.jpg');
+              console.log('hey')
+	      console.log(res);
+            }}
+          />
+          <Button
+            title="Get dominant color from image ref"
+            onPress={async () => {
+              if (!imageRef) {
+                console.log('N');
+                return;
+              }
+              const res = await ExpoImageThemeColors.extractThemeColorAsync(imageRef);
+              console.log(res);
             }}
           />
         </Group>
-        <Group name="Events">
-          <Text>{onChangePayload?.value}</Text>
-        </Group>
-        <Group name="Views">
-          <ExpoImageThemeColorsView
-            url="https://www.example.com"
-            onLoad={({ nativeEvent: { url } }) => console.log(`Loaded: ${url}`)}
-            style={styles.view}
-          />
-        </Group>
       </ScrollView>
-    </SafeAreaView>
   );
 }
 

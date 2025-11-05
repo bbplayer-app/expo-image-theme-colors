@@ -1,19 +1,50 @@
-import type { StyleProp, ViewStyle } from 'react-native';
+/**
+ * Represents the result of extracting dominant colors from an image.
+ */
+export type ThemeColorResult = {
+  /**
+   * The dominant color hex string (e.g., "#RRGGBB").
+   * May be null if no color was found.
+   */
+  dominant?: string | null;
 
-export type OnLoadEventPayload = {
-  url: string;
-};
+  /**
+   * The vibrant color hex string.
+   */
+  vibrant?: string | null;
 
-export type ExpoImageThemeColorsModuleEvents = {
-  onChange: (params: ChangeEventPayload) => void;
-};
+  /**
+   * The light vibrant color hex string.
+   */
+  lightVibrant?: string | null;
 
-export type ChangeEventPayload = {
-  value: string;
-};
+  /**
+   * The dark vibrant color hex string.
+   */
+  darkVibrant?: string | null;
 
-export type ExpoImageThemeColorsViewProps = {
-  url: string;
-  onLoad: (event: { nativeEvent: OnLoadEventPayload }) => void;
-  style?: StyleProp<ViewStyle>;
+  /**
+   * The muted color hex string.
+   */
+  muted?: string | null;
+
+  /**
+   * The light muted color hex string.
+   */
+  lightMuted?: string | null;
+
+  /**
+   * The dark muted color hex string.
+   */
+  darkMuted?: string | null;
+
+  /**
+   * Width of the source image.
+   */
+  width: number;
+
+  /**
+   * Height of the source image.
+   */
+  height: number;
 };
