@@ -1,5 +1,5 @@
 {
-  "name": "expo-image-theme-colors",
+  "name": "@bbplayer-app/expo-image-theme-colors",
   "version": "0.1.0",
   "description": "A module to extract theme colors using expo ImageRef",
   "main": "build/index.js",
@@ -39,5 +39,6 @@
     "expo": "*",
     "react": "*",
     "react-native": "*"
-  }
+  },
+  "publishConfig": { "registry": "https://npm.pkg.github.com" }
 }
