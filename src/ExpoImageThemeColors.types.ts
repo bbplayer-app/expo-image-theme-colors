@@ -1,50 +1,36 @@
 /**
- * Represents the result of extracting dominant colors from an image.
+ * 代表一个 swatch 的所有信息
  */
-export type ThemeColorResult = {
-  /**
-   * The dominant color hex string (e.g., "#RRGGBB").
-   * May be null if no color was found.
-   */
-  dominant?: string | null;
+export interface ColorInfo {
+  /** 颜色的 6 位 Hex 值 (e.g., "#FF0000") */
+  hex: string;
+  
+  /** 推荐的标题文本颜色 (e.g., "#FFFFFF") */
+  titleTextColor: string;
+  
+  /** 推荐的正文文本颜色 (e.g., "#000000") */
+  bodyTextColor: string;
+  
+  /** 这个颜色在图片中占了多少像素点 */
+  population: number;
+}
 
-  /**
-   * The vibrant color hex string.
-   */
-  vibrant?: string | null;
+type SwatchName = 
+  | 'dominant'
+  | 'vibrant'
+  | 'lightVibrant'
+  | 'darkVibrant'
+  | 'muted'
+  | 'lightMuted'
+  | 'darkMuted';
 
-  /**
-   * The light vibrant color hex string.
-   */
-  lightVibrant?: string | null;
-
-  /**
-   * The dark vibrant color hex string.
-   */
-  darkVibrant?: string | null;
-
-  /**
-   * The muted color hex string.
-   */
-  muted?: string | null;
-
-  /**
-   * The light muted color hex string.
-   */
-  lightMuted?: string | null;
-
-  /**
-   * The dark muted color hex string.
-   */
-  darkMuted?: string | null;
-
-  /**
-   * Width of the source image.
-   */
-  width: number;
-
-  /**
-   * Height of the source image.
-   */
-  height: number;
+type PaletteSwatches = {
+  [K in SwatchName]: ColorInfo | null;
 };
+
+export type ExtractedPalette = {
+  /** 图片宽度 (px) */
+  width: number;
+  /** 图片高度 (px) */
+  height: number;
+} & PaletteSwatches;

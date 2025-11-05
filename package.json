@@ -21,13 +21,13 @@
     "expo-image-theme-colors",
     "ExpoImageThemeColors"
   ],
-  "repository": "https://github.com/roitium/expo-image-theme-colors",
+  "repository": "https://github.com/bbplayer-app/expo-image-theme-colors",
   "bugs": {
-    "url": "https://github.com/roitium/expo-image-theme-colors/issues"
+    "url": "https://github.com/bbplayer-app/expo-image-theme-colors/issues"
   },
   "author": "Roitium <65794453+roitium@users.noreply.github.com> (https://github.com/roitium)",
   "license": "MIT",
-  "homepage": "https://github.com/roitium/expo-image-theme-colors#readme",
+  "homepage": "https://github.com/bbplayer-app/expo-image-theme-colors#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/react": "~19.1.0",
